@@ -1,0 +1,16 @@
+export const CUSTOM_EVENTS = Object.freeze({
+  APP_READY: 'app:ready',
+  THEME_CHANGED: 'theme:changed',
+  AUTH_LOGIN: 'auth:login',
+  AUTH_LOGOUT: 'auth:logout',
+  SHIFT_OPEN: 'shift:open',
+  SHIFT_CLOSE: 'shift:close',
+  CART_UPDATED: 'cart:updated',
+  CART_CLEARED: 'cart:cleared',
+  SALE_COMPLETED: 'sale:completed',
+  SALE_VOIDED: 'sale:voided',
+  DATA_SYNCED: 'data:synced',
+  STORAGE_CHANGED: 'storage:changed',
+  DB_MIGRATED: 'db:migrated',
+  BACKUP_CREATED: 'backup:created',
+});

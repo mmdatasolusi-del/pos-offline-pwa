@@ -1,0 +1,232 @@
+/* === SIDEBAR === */
+:root {
+  --sidebar-width: 260px;
+  --sidebar-collapsed-width: 64px;
+  --sidebar-bg: #ffffff;
+  --sidebar-border: #e5e7eb;
+  --sidebar-brand-text: #111827;
+  --sidebar-group-label: #9ca3af;
+  --sidebar-item-text: #4b5563;
+  --sidebar-item-hover-bg: #f3f4f6;
+  --sidebar-item-hover-text: #111827;
+  --sidebar-item-active-bg: #eff6ff;
+  --sidebar-item-active-text: #2563eb;
+  --sidebar-chevron: #9ca3af;
+}
+
+[data-theme="dark"] {
+  --sidebar-bg: #1e293b;
+  --sidebar-border: #334155;
+  --sidebar-brand-text: #f1f5f9;
+  --sidebar-group-label: #64748b;
+  --sidebar-item-text: #94a3b8;
+  --sidebar-item-hover-bg: #334155;
+  --sidebar-item-hover-text: #f1f5f9;
+  --sidebar-item-active-bg: #1e3a5f;
+  --sidebar-item-active-text: #60a5fa;
+  --sidebar-chevron: #64748b;
+}
+
+.app-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: var(--sidebar-width);
+  background: var(--sidebar-bg);
+  border-right: 1px solid var(--sidebar-border);
+  z-index: 1040;
+  display: flex;
+  flex-direction: column;
+  transition: width 0.25s ease, transform 0.25s ease;
+  overflow: hidden;
+}
+
+.sidebar-brand {
+  height: 60px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--sidebar-border);
+}
+
+.sidebar-brand-icon {
+  width: 32px;
+  height: 32px;
+  background: #2563eb;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.sidebar-brand-icon i {
+  color: #fff;
+  font-size: 18px;
+}
+
+.sidebar-brand-text {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--sidebar-brand-text);
+  white-space: nowrap;
+  overflow: hidden;
+  transition: opacity 0.2s ease;
+}
+
+.sidebar-nav {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 12px 0;
+}
+
+.sidebar-nav::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb {
+  background: var(--sidebar-border);
+  border-radius: 4px;
+}
+
+.sidebar-section {
+  margin-bottom: 8px;
+}
+
+.sidebar-section-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--sidebar-group-label);
+  padding: 8px 20px 4px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.sidebar-menu {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 16px;
+  margin: 1px 8px;
+  border-radius: 8px;
+  color: var(--sidebar-item-text);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.sidebar-item:hover {
+  background: var(--sidebar-item-hover-bg);
+  color: var(--sidebar-item-hover-text);
+}
+
+.sidebar-item.active {
+  background: var(--sidebar-item-active-bg);
+  color: var(--sidebar-item-active-text);
+  font-weight: 600;
+}
+
+.sidebar-item i {
+  font-size: 18px;
+  width: 22px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.sidebar-item-text {
+  overflow: hidden;
+  transition: opacity 0.2s ease;
+}
+
+.sidebar-toggle {
+  height: 48px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-top: 1px solid var(--sidebar-border);
+  cursor: pointer;
+  color: var(--sidebar-chevron);
+  transition: color 0.15s ease;
+}
+
+.sidebar-toggle:hover {
+  color: var(--sidebar-brand-text);
+}
+
+/* Collapsed state */
+body.sidebar-collapsed .app-sidebar {
+  width: var(--sidebar-collapsed-width);
+}
+
+body.sidebar-collapsed .sidebar-brand-text,
+body.sidebar-collapsed .sidebar-item-text,
+body.sidebar-collapsed .sidebar-section-label {
+  opacity: 0;
+  width: 0;
+}
+
+body.sidebar-collapsed .sidebar-item {
+  justify-content: center;
+  padding: 9px 0;
+  margin: 1px 12px;
+}
+
+body.sidebar-collapsed .sidebar-item i {
+  margin: 0;
+}
+
+body.sidebar-collapsed .sidebar-section-label {
+  height: 0;
+  padding: 0;
+  margin: 0;
+}
+
+/* Mobile overlay */
+.sidebar-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 1039;
+}
+
+@media (max-width: 991.98px) {
+  .app-sidebar {
+    transform: translateX(-100%);
+  }
+
+  body.sidebar-open .app-sidebar {
+    transform: translateX(0);
+  }
+
+  body.sidebar-open .sidebar-backdrop {
+    display: block;
+  }
+
+  body.sidebar-collapsed .app-sidebar {
+    width: var(--sidebar-width);
+  }
+
+  body.sidebar-collapsed .sidebar-brand-text,
+  body.sidebar-collapsed .sidebar-item-text,
+  body.sidebar-collapsed .sidebar-section-label {
+    opacity: 1;
+    width: auto;
+  }
+}

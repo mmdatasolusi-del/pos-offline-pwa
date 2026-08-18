@@ -1,0 +1,9 @@
+﻿node_modules/
+dist/
+*.log
+backups/manual/
+backups/auto/
+backups/export/
+backups/import/
+.DS_Store
+Thumbs.db

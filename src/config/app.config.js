@@ -1,0 +1,16 @@
+export const APP_CONFIG = Object.freeze({
+  appName: 'POS Offline PWA',
+  version: '1.0.0',
+  themeDefault: 'light',
+  currency: 'IDR',
+  locale: 'id-ID',
+  timezone: 'Asia/Jakarta',
+  dateFormat: 'dd/MM/yyyy',
+  timeFormat: 'HH:mm',
+  decimalPrecision: 0,
+  debugMode: false,
+  storagePrefix: 'pos_offline_',
+  sessionTimeout: 30,
+  maxLoginAttempts: 5,
+  lockTimeout: 5,
+});

@@ -1,0 +1,15 @@
+export const DEFAULTS = Object.freeze({
+  theme: 'light',
+  pageSize: 25,
+  currency: 'IDR',
+  taxRate: 11,
+  shiftOpenBalance: 0,
+  lowStockThreshold: 10,
+  dateFormat: 'dd/MM/yyyy',
+  timeFormat: 'HH:mm',
+  decimalPlaces: 0,
+  debounceDelay: 300,
+  searchMinLength: 2,
+  printCopies: 1,
+  autoBackupInterval: 3600000,
+});

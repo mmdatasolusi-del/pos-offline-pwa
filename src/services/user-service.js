@@ -3,7 +3,7 @@ import { generateUUID } from '../utils/id-utils.js';
 import { hashPassword } from '../utils/hash-utils.js';
 
 export async function getUsers() {
-  const users = await db.users.where('deletedAt').equals(null).toArray();
+  const users = (await db.users.toArray()).filter((u) => !u.deletedAt);
   for (const user of users) {
     await migratePlaintextPin(user);
   }
@@ -86,7 +86,7 @@ export async function deleteUser(id) {
 }
 
 export async function getUsersByRole(roleId) {
-  const users = await db.users.where({ roleId, deletedAt: null }).toArray();
+  const users = await db.users.where('roleId').equals(roleId).filter((u) => !u.deletedAt).toArray();
   for (const user of users) {
     await migratePlaintextPin(user);
   }

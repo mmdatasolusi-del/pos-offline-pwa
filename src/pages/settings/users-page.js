@@ -98,7 +98,7 @@ function showUserForm(user, roles, container) {
       </div>
       <div class="mb-3">
         <label class="form-label text-sm fw-medium">PIN (6 digit, opsional)</label>
-        <input type="text" id="uf-pin" class="form-control" value="${isEdit && user.pin ? user.pin : ''}" maxlength="6" pattern="\\d{0,6}" placeholder="Kosongkan jika tidak perlu" style="border-color:var(--color-border)">
+        <input type="password" id="uf-pin" class="form-control" value="" maxlength="6" inputmode="numeric" pattern="\\d{0,6}" placeholder="Kosongkan jika tidak perlu / tidak diubah" autocomplete="off" style="border-color:var(--color-border)">
       </div>
       <div id="uf-error" class="alert d-none py-2 px-3 text-sm" role="alert" style="background-color:var(--color-danger-50);border:1px solid #FECACA;color:var(--color-danger-600)"></div>
     </form>

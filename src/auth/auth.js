@@ -1,5 +1,5 @@
 import db from '../database/db.js';
-import { sha256 } from '../utils/hash-utils.js';
+import { hashPassword } from '../utils/hash-utils.js';
 import { generateUUID } from '../utils/id-utils.js';
 
 function now() {
@@ -70,7 +70,7 @@ export async function createOwnerAccount({ username, fullName, password }) {
     return { success: false, error: 'Username sudah digunakan' };
   }
 
-  const passwordHash = await sha256(password);
+  const passwordHash = await hashPassword(password);
 
   await db.users.add({
     id: 'user-' + generateUUID(),

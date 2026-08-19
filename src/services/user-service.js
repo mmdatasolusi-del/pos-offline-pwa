@@ -1,26 +1,35 @@
 import db from '../database/db.js';
 import { generateUUID } from '../utils/id-utils.js';
+import { hashPassword } from '../utils/hash-utils.js';
 
 export async function getUsers() {
-  return db.users.where('deletedAt').equals(null).toArray();
+  const users = await db.users.where('deletedAt').equals(null).toArray();
+  for (const user of users) {
+    await migratePlaintextPin(user);
+  }
+  return users.map(stripCredentialFields);
 }
 
 export async function getUser(id) {
-  return db.users.get(id);
+  const user = await db.users.get(id);
+  if (!user) return null;
+  await migratePlaintextPin(user);
+  return stripCredentialFields(user);
 }
 
 export async function createUser(data) {
   const existing = await db.users.where('username').equals(data.username.toLowerCase()).first();
   if (existing) throw new Error('Username sudah digunakan');
 
-  const hash = await sha256(data.password);
+  const passwordHash = await hashPassword(data.password);
+  const pinHash = data.pin ? await hashPassword(String(data.pin)) : null;
   const user = {
     id: generateUUID(),
     username: data.username.toLowerCase(),
-    passwordHash: hash,
+    passwordHash,
     fullName: data.fullName,
     roleId: data.roleId,
-    pin: data.pin || null,
+    pinHash,
     isActive: data.isActive !== false,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
@@ -28,7 +37,7 @@ export async function createUser(data) {
   };
 
   await db.users.add(user);
-  return user;
+  return stripCredentialFields(user);
 }
 
 export async function updateUser(id, data) {
@@ -41,15 +50,19 @@ export async function updateUser(id, data) {
 
   if (data.fullName !== undefined) updates.fullName = data.fullName;
   if (data.roleId !== undefined) updates.roleId = data.roleId;
-  if (data.pin !== undefined) updates.pin = data.pin || null;
   if (data.isActive !== undefined) updates.isActive = data.isActive;
 
+  if (typeof data.pin === 'string' && data.pin !== '') {
+    updates.pinHash = await hashPassword(data.pin);
+    updates.pin = undefined; // hapus kemungkinan pin plaintext dari record lama
+  }
+
   if (data.password) {
-    updates.passwordHash = await sha256(data.password);
+    updates.passwordHash = await hashPassword(data.password);
   }
 
   await db.users.update(id, updates);
-  return { ...user, ...updates };
+  return stripCredentialFields({ ...user, ...updates });
 }
 
 export async function deleteUser(id) {
@@ -73,14 +86,32 @@ export async function deleteUser(id) {
 }
 
 export async function getUsersByRole(roleId) {
-  return db.users.where({ roleId, deletedAt: null }).toArray();
+  const users = await db.users.where({ roleId, deletedAt: null }).toArray();
+  for (const user of users) {
+    await migratePlaintextPin(user);
+  }
+  return users.map(stripCredentialFields);
 }
 
-async function sha256(message) {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(message);
-  const hash = await crypto.subtle.digest('SHA-256', data);
-  return Array.from(new Uint8Array(hash))
-    .map((b) => b.toString(16).padStart(2, '0'))
-    .join('');
+async function migratePlaintextPin(user) {
+  if (!user || user.pinHash || !user.pin) return;
+  try {
+    const pinHash = await hashPassword(String(user.pin));
+    await db.users.update(user.id, {
+      pinHash,
+      pin: undefined,
+      updatedAt: new Date().toISOString(),
+    });
+    delete user.pin;
+    user.pinHash = pinHash;
+  } catch (error) {
+    // Jangan gagalkan operasi baca; PIN lama tidak boleh diekspos ke response.
+    delete user.pin;
+  }
+}
+
+function stripCredentialFields(user) {
+  if (!user) return user;
+  const { passwordHash, pin, pinHash, ...safe } = user;
+  return safe;
 }

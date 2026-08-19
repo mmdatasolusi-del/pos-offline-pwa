@@ -1,5 +1,5 @@
 import db from '../database/db.js';
-import { sha256 } from '../utils/hash-utils.js';
+import { verifyPassword, isPbkdf2Hash, hashPassword } from '../utils/hash-utils.js';
 
 export async function authenticate(username, password) {
   if (!username || !password) {
@@ -20,9 +20,22 @@ export async function authenticate(username, password) {
     return { success: false, error: 'Akun telah dinonaktifkan' };
   }
 
-  const hash = await sha256(password);
-  if (user.passwordHash !== hash) {
+  const ok = await verifyPassword(password, user.passwordHash);
+  if (!ok) {
     return { success: false, error: 'Password salah' };
+  }
+
+  // Migrasi lazy & idempotent: hash legacy SHA-256 ditingkatkan ke PBKDF2+salt.
+  if (!isPbkdf2Hash(user.passwordHash)) {
+    try {
+      const upgraded = await hashPassword(password);
+      await db.users.update(user.id, {
+        passwordHash: upgraded,
+        updatedAt: new Date().toISOString(),
+      });
+    } catch (error) {
+      console.warn('[Auth] Gagal mengupgrade hash password lama:', error.message);
+    }
   }
 
   const role = await db.roles.get(user.roleId);

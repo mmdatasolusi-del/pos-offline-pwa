@@ -2,7 +2,10 @@ import db from '../database/db.js';
 import { generateUUID } from '../utils/id-utils.js';
 
 export async function getRoles() {
-  return db.roles.orderBy('sortOrder').toArray();
+  // `sortOrder` tidak diindeks di skema `roles`, jadi urutkan di memori
+  // (IndexedDB menolak orderBy pada key path yang tidak diindeks).
+  const roles = await db.roles.toArray();
+  return roles.sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
 }
 
 export async function getRole(id) {
@@ -13,12 +16,13 @@ export async function createRole(data) {
   const existing = await db.roles.where('name').equals(data.name).first();
   if (existing) throw new Error('Nama role sudah digunakan');
 
-  const maxSort = await db.roles.orderBy('sortOrder').last();
+  const roles = await db.roles.toArray();
+  const maxSort = roles.reduce((max, r) => Math.max(max, r.sortOrder ?? 0), 0);
   const role = {
     id: generateUUID(),
     name: data.name,
     isSystem: false,
-    sortOrder: (maxSort?.sortOrder || 0) + 1,
+    sortOrder: maxSort + 1,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     deletedAt: null,

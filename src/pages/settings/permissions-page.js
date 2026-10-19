@@ -14,7 +14,7 @@ export async function init(container) {
     </div>
     <div id="permission-tabs" class="mb-3"></div>
     <div id="permission-content"></div>
-  `);
+  `;
 
   const tabsContainer = document.getElementById('permission-tabs');
   const contentContainer = document.getElementById('permission-content');

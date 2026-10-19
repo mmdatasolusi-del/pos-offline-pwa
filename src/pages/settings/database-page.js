@@ -10,7 +10,7 @@ export async function init(container) {
   let totalRecords = 0;
 
   for (const table of TABLES) {
-    const count = await db[table.name].count();
+    const count = await db.table(table.name).count();
     tableStats.push({ name: table.name, count });
     totalRecords += count;
   }
@@ -97,7 +97,7 @@ export async function init(container) {
         clearBtn.setLoading(true);
         try {
           for (const table of TABLES) {
-            await db[table.name].clear();
+            await db.table(table.name).clear();
           }
           showToast('Semua data berhasil dihapus', 'success');
           setTimeout(() => window.location.reload(), 1000);

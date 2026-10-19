@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'v4';
+const CACHE_VERSION = 'v6';
 
 const APP_CACHE = `pos-app-${CACHE_VERSION}`;
 const CDN_CACHE = `pos-cdn-${CACHE_VERSION}`;

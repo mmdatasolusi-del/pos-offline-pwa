@@ -1,8 +1,8 @@
 export const PWA_CONFIG = Object.freeze({
-  cacheVersion: 'v4',
-  appCache: 'pos-app-v4',
-  cdnCache: 'pos-cdn-v4',
-  dynamicCache: 'pos-dynamic-v4',
+  cacheVersion: 'v6',
+  appCache: 'pos-app-v6',
+  cdnCache: 'pos-cdn-v6',
+  dynamicCache: 'pos-dynamic-v6',
 
   appAssets: [
     '/',

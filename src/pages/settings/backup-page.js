@@ -52,8 +52,8 @@ export async function init(container) {
                   <tr>
                     <td class="text-sm">${new Date(b.exportedAt).toLocaleString('id-ID')}</td>
                     <td class="text-sm">${formatBytes(b.fileSize)}</td>
-                    <td>${AppBadge({ text: 'v' + b.schemaVersion, variant: 'ACTIVE' }).outerHTML}</td>
-                    <td><code class="text-xs">${b.checksum.slice(0, 16)}...</code></td>
+                    <td>${AppBadge({ text: 'v' + (b.schemaVersion ?? '?'), variant: 'ACTIVE' }).outerHTML}</td>
+                    <td><code class="text-xs">${b.checksum ? b.checksum.slice(0, 16) + '...' : '-'}</code></td>
                   </tr>
                 `).join('')}
               </tbody>

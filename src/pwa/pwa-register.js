@@ -1,4 +1,6 @@
-const SW_PATH = '/service-worker.js';
+// Relative paths so the app works both on "/" and on sub-paths like "/repo-name/" (GitHub Pages)
+const SW_PATH = './service-worker.js';
+const SW_SCOPE = './';
 
 class PWARegister {
   #registration = null;
@@ -23,7 +25,7 @@ class PWARegister {
       console.log('[PWA] Registering Service Worker...');
 
       this.#registration = await navigator.serviceWorker.register(SW_PATH, {
-        scope: '/',
+        scope: SW_SCOPE,
       });
 
       this.#registration.addEventListener('updatefound', () => {

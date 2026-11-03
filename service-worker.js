@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'v6';
+const CACHE_VERSION = 'v7';
 
 const APP_CACHE = `pos-app-${CACHE_VERSION}`;
 const CDN_CACHE = `pos-cdn-${CACHE_VERSION}`;
@@ -7,63 +7,63 @@ const DYNAMIC_CACHE = `pos-dynamic-${CACHE_VERSION}`;
 const VALID_CACHES = [APP_CACHE, CDN_CACHE, DYNAMIC_CACHE];
 
 const APP_ASSETS = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/src/pwa/offline.html',
-  '/src/pwa/icons/icon-192.svg',
-  '/src/pwa/icons/icon-512.svg',
-  '/src/pwa/pwa-config.js',
-  '/src/pwa/pwa-cache-manager.js',
-  '/src/pwa/pwa-register.js',
-  '/src/pwa/pwa-install.js',
-  '/src/pwa/pwa-service.js',
-  '/src/pwa/manifest.js',
-  '/src/app/app.js',
-  '/src/app/bootstrap.js',
-  '/src/config/app.config.js',
-  '/src/config/db.config.js',
-  '/src/config/theme.config.js',
-  '/src/utils/logger.js',
-  '/src/utils/error-handler.js',
-  '/src/utils/id-utils.js',
-  '/src/utils/hash-utils.js',
-  '/src/database/db.js',
-  '/src/database/schema.js',
-  '/src/database/migrations.js',
-  '/src/database/seeds.js',
-  '/src/database/database-manager.js',
-  '/src/database/backup.js',
-  '/src/database/restore.js',
-  '/src/repositories/base-repository.js',
-  '/src/services/theme-service.js',
-  '/src/services/auth-service.js',
-  '/src/services/idle-service.js',
-  '/src/auth/session.js',
-  '/src/auth/login.js',
-  '/src/auth/auth.js',
-  '/src/components/Sidebar.js',
-  '/src/components/Topbar.js',
-  '/src/components/LoginForm.js',
-  '/src/components/KPI.js',
-  '/src/components/Card.js',
-  '/src/pages/LoginPage.js',
-  '/src/pages/Dashboard.js',
-  '/src/pages/FirstRunPage.js',
-  '/src/layouts/AppLayout.js',
-  '/src/router/router.js',
-  '/src/router/guards.js',
-  '/src/helpers/export-helper.js',
-  '/src/helpers/import-helper.js',
-  '/src/styles/variables.css',
-  '/src/styles/base.css',
-  '/src/styles/theme.css',
-  '/src/styles/layout.css',
-  '/src/styles/components.css',
-  '/src/styles/utilities.css',
-  '/src/styles/sidebar.css',
-  '/src/styles/topbar.css',
-  '/src/styles/dashboard.css',
+  '',
+  'index.html',
+  'manifest.json',
+  'src/pwa/offline.html',
+  'src/pwa/icons/icon-192.svg',
+  'src/pwa/icons/icon-512.svg',
+  'src/pwa/pwa-config.js',
+  'src/pwa/pwa-cache-manager.js',
+  'src/pwa/pwa-register.js',
+  'src/pwa/pwa-install.js',
+  'src/pwa/pwa-service.js',
+  'src/pwa/manifest.js',
+  'src/app/app.js',
+  'src/app/bootstrap.js',
+  'src/config/app.config.js',
+  'src/config/db.config.js',
+  'src/config/theme.config.js',
+  'src/utils/logger.js',
+  'src/utils/error-handler.js',
+  'src/utils/id-utils.js',
+  'src/utils/hash-utils.js',
+  'src/database/db.js',
+  'src/database/schema.js',
+  'src/database/migrations.js',
+  'src/database/seeds.js',
+  'src/database/database-manager.js',
+  'src/database/backup.js',
+  'src/database/restore.js',
+  'src/repositories/base-repository.js',
+  'src/services/theme-service.js',
+  'src/services/auth-service.js',
+  'src/services/idle-service.js',
+  'src/auth/session.js',
+  'src/auth/login.js',
+  'src/auth/auth.js',
+  'src/components/Sidebar.js',
+  'src/components/Topbar.js',
+  'src/components/LoginForm.js',
+  'src/components/KPI.js',
+  'src/components/Card.js',
+  'src/pages/LoginPage.js',
+  'src/pages/Dashboard.js',
+  'src/pages/FirstRunPage.js',
+  'src/layouts/AppLayout.js',
+  'src/router/router.js',
+  'src/router/guards.js',
+  'src/helpers/export-helper.js',
+  'src/helpers/import-helper.js',
+  'src/styles/variables.css',
+  'src/styles/base.css',
+  'src/styles/theme.css',
+  'src/styles/layout.css',
+  'src/styles/components.css',
+  'src/styles/utilities.css',
+  'src/styles/sidebar.css',
+  'src/styles/topbar.css',
+  'src/styles/dashboard.css',
 ];
 
 const CDN_ASSETS = [
@@ -120,7 +120,7 @@ async function cacheFirst(request, cacheName) {
     return response;
   } catch {
     if (request.mode === 'navigate') {
-      return caches.match('/src/pwa/offline.html');
+      return caches.match('src/pwa/offline.html');
     }
     return new Response('', { status: 408 });
   }
@@ -138,7 +138,7 @@ async function networkFirst(request) {
     const cached = await caches.match(request);
     if (cached) return cached;
     if (request.mode === 'navigate') {
-      return caches.match('/src/pwa/offline.html');
+      return caches.match('src/pwa/offline.html');
     }
     return new Response('', { status: 408 });
   }
@@ -154,12 +154,30 @@ function isCDNOrigin(url) {
 
 function isAppAsset(url) {
   if (!isAppOrigin(url)) return false;
+  // Support both root deploy ("/") and sub-path deploy (GitHub Pages "/repo-name/").
   const path = url.pathname;
+  const base = self.location.pathname.replace(/[^/]*$/, ''); // e.g. "/repo-name/"
+  if (!path.startsWith(base)) return false;
+  const rel = path.slice(base.length);
   return (
-    path === '/' ||
-    path === '/index.html' ||
-    path === '/manifest.json' ||
-    path.startsWith('/src/')
+    rel === '' ||
+    rel === 'index.html' ||
+    rel === 'manifest.json' ||
+    rel.startsWith('src/')
+  );
+}
+
+function isNavigationRequest(request, url) {
+  const path = url.pathname;
+  const base = self.location.pathname.replace(/[^/]*$/, '');
+  const rel = path.startsWith(base) ? path.slice(base.length) : path;
+  return (
+    request.mode === 'navigate' ||
+    rel === '' ||
+    rel === '/' ||
+    rel === './' ||
+    rel === 'index.html' ||
+    path === base + 'index.html'
   );
 }
 
@@ -204,7 +222,7 @@ self.addEventListener('fetch', event => {
 
   if (isAppAsset(url)) {
     // Navigasi: Network First agar build baru langsung digunakan.
-    if (request.mode === 'navigate' || url.pathname === '/' || url.pathname === '/index.html') {
+    if (isNavigationRequest(request, url)) {
       event.respondWith(networkFirst(request));
     } else {
       // Asset statis: Cache First.
